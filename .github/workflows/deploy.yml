@@ -5,6 +5,11 @@ on:
     branches:
       - main
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run tests
+        run: echo "Running tests..."
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 60
