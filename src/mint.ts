@@ -24,31 +24,41 @@ import {
 } from './utils/metaplex';
 import { encodeUmiTransaction } from './utils/transactions';
 
-export async function constructMultipleMintTransaction(
-	candyMachineAddress: UmiPublicKey,
-	collectionAddress: UmiPublicKey,
-	candyGuard: CandyGuardAccountData<DefaultGuardSet>,
-	minter: UmiPublicKey,
-	label: string,
-	numberOfItems: number,
-	blockHash: BlockhashWithExpiryBlockHeight,
-	lookupTable?: AddressLookupTableInput,
-	isSponsored = false
-): Promise<string | undefined> {
+export async function constructMultipleMintTransaction({
+	candyMachineAddress,
+	collectionAddress,
+	candyGuard,
+	minter,
+	label,
+	numberOfItems,
+	blockHash,
+	lookupTable,
+	isSponsored = false,
+}: {
+	candyMachineAddress: UmiPublicKey;
+	collectionAddress: UmiPublicKey;
+	candyGuard: CandyGuardAccountData<DefaultGuardSet>;
+	minter: UmiPublicKey;
+	label: string;
+	numberOfItems: number;
+	blockHash: BlockhashWithExpiryBlockHeight ;
+	lookupTable?: AddressLookupTableInput;
+	isSponsored?: boolean;
+}): Promise<string | undefined> {
 	try {
 		const mintArgs = getMintArgs(candyMachineAddress, candyGuard, label);
 
-		const mintTransaction = await getAuthorizedMintTransaction(
-			candyMachineAddress,
-			collectionAddress,
+		const mintTransaction = await getAuthorizedMintTransaction({
+			candyMachine: candyMachineAddress,
+			collection: collectionAddress,
 			minter,
 			numberOfItems,
 			label,
 			mintArgs,
 			blockHash,
 			lookupTable,
-			isSponsored
-		);
+			isSponsored,
+		});
 
 		const encodedMintTransaction = encodeUmiTransaction(mintTransaction, 'base64');
 
@@ -58,17 +68,28 @@ export async function constructMultipleMintTransaction(
 	}
 }
 
-async function getAuthorizedMintTransaction(
-	candyMachine: UmiPublicKey,
-	collection: UmiPublicKey,
-	minter: UmiPublicKey,
-	numberOfItems: number,
-	label: string,
-	mintArgs: Partial<DefaultGuardSetMintArgs>,
-	blockHash: BlockhashWithExpiryBlockHeight,
-	lookupTable?: AddressLookupTableInput,
-	isSponsored = false
-) {
+async function getAuthorizedMintTransaction({
+	candyMachine,
+	collection,
+	minter,
+	numberOfItems,
+	label,
+	blockHash,
+	mintArgs,
+	isSponsored = false,
+	lookupTable,
+
+}: {
+	candyMachine: UmiPublicKey;
+	collection: UmiPublicKey;
+	minter: UmiPublicKey;
+	numberOfItems: number;
+	label: string;
+	mintArgs: Partial<DefaultGuardSetMintArgs>;
+	blockHash: BlockhashWithExpiryBlockHeight;
+	lookupTable?: AddressLookupTableInput;
+	isSponsored?: boolean;
+}) {
 	const identityPublicKey = getTreasuryPublicKey();
 	const authorizationSigner = getAuthorizationSignerUmiPublicKey();
 	const signer = createNoopSigner(minter);
@@ -129,6 +150,9 @@ function getMintArgs(candyMachineAddress: UmiPublicKey, candyGuard: CandyGuardAc
 
 	const mintArgsEntries = availableGuards
 		.map((guard) => {
+			if (!resolvedGuards[guard]) {
+				return;
+			}
 			if (resolvedGuards[guard].__option == 'Some') {
 				switch (guard) {
 					case 'thirdPartySigner':
@@ -206,9 +230,9 @@ function getMintArgs(candyMachineAddress: UmiPublicKey, candyGuard: CandyGuardAc
 				}
 			}
 		})
-		.filter(Boolean);
+		.filter((item) => item?.at(0) && item.at(1));
 
-	const mintArgs: Partial<DefaultGuardSetMintArgs> = Object.fromEntries(mintArgsEntries);
+	const mintArgs: Partial<DefaultGuardSetMintArgs> = Object.fromEntries(mintArgsEntries.map((item) => [item?.at(0), item?.at(1)]));
 
 	return mintArgs;
 }
