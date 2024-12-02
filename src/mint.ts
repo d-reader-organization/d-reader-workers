@@ -74,7 +74,7 @@ async function getAuthorizedMintTransaction(
 	const signer = createNoopSigner(minter);
 	const CORE_MINT_COMPUTE_UNITS = 160000;
 
-	const payer = isSponsored ? createNoopSigner(publicKey(identityPublicKey)) : signer;
+	const payer = isSponsored ? createNoopSigner(identityPublicKey) : signer;
 
 	let builder = transactionBuilder().add(
 		setComputeUnitLimit(umi, {
