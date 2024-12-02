@@ -8,6 +8,8 @@ import {
 	Transaction as UmiTransaction,
 } from '@metaplex-foundation/umi';
 import { mplCandyMachine } from '@metaplex-foundation/mpl-core-candy-machine';
+import * as AES from 'crypto-js/aes';
+import * as Utf8 from 'crypto-js/enc-utf8';
 
 enum Cluster {
 	Devnet = 'devnet',
@@ -41,9 +43,9 @@ export class CustomMetaplex {
 	 * Retrieves the authorization signer keypair from encrypted environment variables.
 	 */
 	getAuthorizationSignerKeypair(): Keypair {
-		const authorizationKeypair = this.umi.eddsa.createKeypairFromSecretKey(
-			Buffer.from(JSON.parse(this.env.AUTHORIZATION_SIGNER_SECRET ?? ''))
-		);
+		const authorizationSigner = AES.decrypt(this.env.AUTHORIZATION_SIGNER_PRIVATE_KEY,this.env.AUTHORIZATION_SIGNER_SECRET);
+		const authorizationKeypair = this.umi.eddsa.createKeypairFromSecretKey(Buffer.from(JSON.parse(authorizationSigner.toString(Utf8))));
+
 		return authorizationKeypair;
 	}
 
@@ -78,7 +80,8 @@ export class CustomMetaplex {
 	 * Retrieves the treasury keypair from encrypted environment variables.
 	 */
 	getTreasuryKeypair(): Keypair {
-		const treasuryKeypair = this.umi.eddsa.createKeypairFromSecretKey(Buffer.from(JSON.parse(this.env.TREASURY_SECRET)));
+		const treasurySigner = AES.decrypt(this.env.TREASURY_PRIVATE_KEY,this.env.TREASURY_SECRET);
+		const treasuryKeypair = this.umi.eddsa.createKeypairFromSecretKey(Buffer.from(JSON.parse(treasurySigner.toString(Utf8))));
 		return treasuryKeypair;
 	}
 

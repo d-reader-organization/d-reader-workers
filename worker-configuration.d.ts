@@ -2,7 +2,9 @@
 
 interface Env {
 	AUTHORIZATION_SIGNER_SECRET: string;
+	AUTHORIZATION_SIGNER_PRIVATE_KEY: string;
 	TREASURY_SECRET: string;
+	TREASURY_PRIVATE_KEY: string;
 	HELIUS_API_KEY: string;
 	SOLANA_CLUSTER: string;
 }
