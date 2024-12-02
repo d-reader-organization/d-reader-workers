@@ -11,8 +11,13 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
+import { createMintTransaction } from './mintWrapper';
+import { CustomMetaplex } from './utils/metaplex';
+
 export default {
 	async fetch(request, env, ctx): Promise<Response> {
+		const metaplex = new CustomMetaplex(env);
+		const transaction = await createMintTransaction(metaplex);
 		return new Response('Hello DReaders!!');
 	},
 } satisfies ExportedHandler<Env>;

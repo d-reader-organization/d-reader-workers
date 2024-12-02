@@ -15,14 +15,8 @@ import {
 	CandyGuardAccountData,
 } from '@metaplex-foundation/mpl-core-candy-machine';
 import { setComputeUnitLimit } from '@metaplex-foundation/mpl-toolbox';
-import {
-	getAuthorizationSignerUmiPublicKey,
-	getAuthorizationSignerUmiSignature,
-	getIdentityUmiSignature,
-	getTreasuryPublicKey,
-	umi,
-} from './utils/metaplex';
 import { encodeUmiTransaction } from './utils/transactions';
+import { CustomMetaplex } from './utils/metaplex';
 
 export async function constructMultipleMintTransaction({
 	candyMachineAddress,
@@ -34,6 +28,7 @@ export async function constructMultipleMintTransaction({
 	blockHash,
 	lookupTable,
 	isSponsored = false,
+	metaplex,
 }: {
 	candyMachineAddress: UmiPublicKey;
 	collectionAddress: UmiPublicKey;
@@ -41,9 +36,10 @@ export async function constructMultipleMintTransaction({
 	minter: UmiPublicKey;
 	label: string;
 	numberOfItems: number;
-	blockHash: BlockhashWithExpiryBlockHeight ;
+	blockHash: BlockhashWithExpiryBlockHeight;
 	lookupTable?: AddressLookupTableInput;
 	isSponsored?: boolean;
+	metaplex: CustomMetaplex;
 }): Promise<string | undefined> {
 	try {
 		const mintArgs = getMintArgs(candyMachineAddress, candyGuard, label);
@@ -58,9 +54,10 @@ export async function constructMultipleMintTransaction({
 			blockHash,
 			lookupTable,
 			isSponsored,
+			metaplex,
 		});
 
-		const encodedMintTransaction = encodeUmiTransaction(mintTransaction, 'base64');
+		const encodedMintTransaction = encodeUmiTransaction({ encoding: 'base64', transaction: mintTransaction, umi: metaplex.umi });
 
 		return encodedMintTransaction;
 	} catch (e) {
@@ -78,7 +75,7 @@ async function getAuthorizedMintTransaction({
 	mintArgs,
 	isSponsored = false,
 	lookupTable,
-
+	metaplex,
 }: {
 	candyMachine: UmiPublicKey;
 	collection: UmiPublicKey;
@@ -89,14 +86,15 @@ async function getAuthorizedMintTransaction({
 	blockHash: BlockhashWithExpiryBlockHeight;
 	lookupTable?: AddressLookupTableInput;
 	isSponsored?: boolean;
+	metaplex: CustomMetaplex;
 }) {
-	const identityPublicKey = getTreasuryPublicKey();
-	const authorizationSigner = getAuthorizationSignerUmiPublicKey();
+	const identityPublicKey = metaplex.getTreasuryPublicKey();
+	const authorizationSigner = metaplex.getAuthorizationSignerUmiPublicKey();
 	const signer = createNoopSigner(minter);
 	const CORE_MINT_COMPUTE_UNITS = 160000;
 
 	const payer = isSponsored ? createNoopSigner(identityPublicKey) : signer;
-
+	const umi = metaplex.umi;
 	let builder = transactionBuilder().add(
 		setComputeUnitLimit(umi, {
 			units: CORE_MINT_COMPUTE_UNITS * numberOfItems,
@@ -128,8 +126,8 @@ async function getAuthorizedMintTransaction({
 		.setAddressLookupTables(lookupTable ? [lookupTable] : [])
 		.buildAndSign({ ...umi, payer });
 
-	const authorizedTransaction = await getAuthorizationSignerUmiSignature(transaction);
-	return isSponsored ? getIdentityUmiSignature(authorizedTransaction) : authorizedTransaction;
+	const authorizedTransaction = await metaplex.getAuthorizationSignerUmiSignature(transaction);
+	return isSponsored ? metaplex.getIdentityUmiSignature(authorizedTransaction) : authorizedTransaction;
 }
 
 function getMintArgs(candyMachineAddress: UmiPublicKey, candyGuard: CandyGuardAccountData<DefaultGuardSet>, label: string) {
