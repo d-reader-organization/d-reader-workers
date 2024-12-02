@@ -31,8 +31,7 @@ function clusterHeliusApiUrl(apiKey: string, cluster: Cluster = Cluster.Devnet) 
  * Retrieves the authorization signer keypair from encrypted environment variables.
  */
 const getAuthorizationSignerKeypair = () : Keypair => {
-	const authorizationSigner = AES.decrypt(process.env.AUTHORIZATION_SIGNER_PRIVATE_KEY, process.env.AUTHORIZATION_SIGNER_SECRET);
-	const authorizationKeypair = umi.eddsa.createKeypairFromSecretKey(Buffer.from(JSON.parse(authorizationSigner.toString(Utf8))));
+	const authorizationKeypair = umi.eddsa.createKeypairFromSecretKey(Buffer.from(JSON.parse(process.env.AUTHORIZATION_SIGNER_SECRET)));
 	return authorizationKeypair;
 };
 
@@ -67,8 +66,7 @@ export const getIdentityUmiSignature = async (transaction: UmiTransaction) : Pro
  * Retrieves the treasury keypair from encrypted environment variables.
  */
 const getTreasuryKeypair = () : Keypair => {
-	const treasuryWallet = AES.decrypt(process.env.TREASURY_PRIVATE_KEY, process.env.TREASURY_SECRET);
-	const treasuryKeypair = umi.eddsa.createKeypairFromSecretKey(Buffer.from(JSON.parse(treasuryWallet.toString(Utf8))));
+	const treasuryKeypair = umi.eddsa.createKeypairFromSecretKey(Buffer.from(JSON.parse(process.env.TREASURY_SECRET)));
 	return treasuryKeypair;
 };
 
