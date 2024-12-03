@@ -1,0 +1,29 @@
+name: Dev - Deploy Worker
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js 22.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22.x
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Deploy Cloudflare Worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: yarn deploy --env dev
