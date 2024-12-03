@@ -15,6 +15,7 @@ import { CustomMetaplex } from './utils/metaplex';
 import { publicKey } from '@metaplex-foundation/umi';
 import { constructMultipleMintTransaction } from './mint';
 import { extractCandyGuardFromBuffer, getLookupTable } from './utils/utils';
+import { constructMintPath } from './constants';
 
 type RequestBody = {
 	candyMachineAddress: string;
@@ -30,24 +31,26 @@ type RequestBody = {
 
 export default {
 	async fetch(request, env, ctx): Promise<Response> {
-		const json = (await request.json()) as RequestBody;
+		const url = new URL(request.url);
 
-		const metaplex = new CustomMetaplex(env);
-		const lookupTable = getLookupTable({ address: json.lookupTableAddress, bufferString: json.lookupTableBufferString });
-		const candyGuard = extractCandyGuardFromBuffer({ bufferString: json.candyGuardBufferString, umi: metaplex.umi });
-
-		const transaction = await constructMultipleMintTransaction({
-			candyGuard,
-			candyMachineAddress: publicKey(json.candyMachineAddress),
-			collectionAddress: publicKey(json.collectionAddress),
-			label: json.label,
-			metaplex,
-			minter: publicKey(json.minter),
-			numberOfItems: json.numberOfItems,
-			lookupTable,
-			isSponsored: json.isSponsored,
-		});
-
-		return new Response(JSON.stringify({ transaction }));
+		if (request.method === 'POST' && url.pathname === constructMintPath) {
+			const json = (await request.json()) as RequestBody;
+			const metaplex = new CustomMetaplex(env);
+			const lookupTable = getLookupTable({ address: json.lookupTableAddress, bufferString: json.lookupTableBufferString });
+			const candyGuard = extractCandyGuardFromBuffer({ bufferString: json.candyGuardBufferString, umi: metaplex.umi });
+			const transaction = await constructMultipleMintTransaction({
+				candyGuard,
+				candyMachineAddress: publicKey(json.candyMachineAddress),
+				collectionAddress: publicKey(json.collectionAddress),
+				label: json.label,
+				metaplex,
+				minter: publicKey(json.minter),
+				numberOfItems: json.numberOfItems,
+				lookupTable,
+				isSponsored: json.isSponsored,
+			});
+			return new Response(JSON.stringify({ transaction }));
+		}
+		return new Response('ok');
 	},
 } satisfies ExportedHandler<Env>;
