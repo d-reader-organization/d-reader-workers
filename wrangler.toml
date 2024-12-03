@@ -18,6 +18,7 @@ TREASURY_PRIVATE_KEY='treasury-private-key'
 TREASURY_SECRET='treasury-secret'
 HELIUS_API_KEY='helius-api-key'
 SOLANA_CLUSTER='devnet'
+API_KEY='api-key'
 
 # Automatically place your workloads in an optimal location to minimize latency.
 # If you are running back-end logic in a Worker, running it closer to your back-end infrastructure

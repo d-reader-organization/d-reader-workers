@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const ConstructMintTransactionSchema = z.object({
+export const constructMintTransactionSchema = z.object({
   candyMachineAddress: z.string(),
   collectionAddress: z.string(),
   candyGuardBufferString: z.string(),
