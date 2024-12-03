@@ -3,7 +3,7 @@ name = "d-reader-workers"
 main = "src/index.ts"
 compatibility_date = "2024-11-27"
 compatibility_flags = ["nodejs_compat"]
-routes = [{ pattern = "workers.dreader.io", custom_domain = true }]
+route = "workers.dreader.io"
 
 # Workers Logs
 # Docs: https://developers.cloudflare.com/workers/observability/logs/workers-logs/
@@ -11,14 +11,8 @@ routes = [{ pattern = "workers.dreader.io", custom_domain = true }]
 [observability]
 enabled = true
 
-[vars]
-AUTHORIZATION_SIGNER_PRIVATE_KEY='signer-private-key'
-AUTHORIZATION_SIGNER_SECRET = 'signer-secret'
-TREASURY_PRIVATE_KEY='treasury-private-key'
-TREASURY_SECRET='treasury-secret'
-HELIUS_API_KEY='helius-api-key'
-SOLANA_CLUSTER='devnet'
-API_KEY='api-key'
+[env.dev]
+workers_dev = true
 
 # Automatically place your workloads in an optimal location to minimize latency.
 # If you are running back-end logic in a Worker, running it closer to your back-end infrastructure
