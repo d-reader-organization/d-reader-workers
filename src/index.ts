@@ -16,39 +16,32 @@ import { publicKey } from '@metaplex-foundation/umi';
 import { constructMultipleMintTransaction } from './mint';
 import { extractCandyGuardFromBuffer, getLookupTable } from './utils/utils';
 import { constructMintPath } from './constants';
-
-type RequestBody = {
-	candyMachineAddress: string;
-	collectionAddress: string;
-	candyGuardBufferString: string;
-	lookupTableAddress?: string;
-	lookupTableBufferString?: string;
-	minter: string;
-	label: string;
-	numberOfItems: number;
-	isSponsored?: boolean;
-};
+import { ConstructMintTransactionSchema } from './utils/schema';
 
 export default {
 	async fetch(request, env, ctx): Promise<Response> {
 		const url = new URL(request.url);
 
 		if (request.method === 'POST' && url.pathname === constructMintPath) {
-			const json = (await request.json()) as RequestBody;
+			const json = await request.json();
+			const body = ConstructMintTransactionSchema.parse(json);
+	
 			const metaplex = new CustomMetaplex(env);
-			const lookupTable = getLookupTable({ address: json.lookupTableAddress, bufferString: json.lookupTableBufferString });
-			const candyGuard = extractCandyGuardFromBuffer({ bufferString: json.candyGuardBufferString, umi: metaplex.umi });
+			const lookupTable = getLookupTable({ address: body.lookupTableAddress, bufferString: body.lookupTableBufferString });
+			const candyGuard = extractCandyGuardFromBuffer({ bufferString: body.candyGuardBufferString, umi: metaplex.umi });
+	
 			const transaction = await constructMultipleMintTransaction({
 				candyGuard,
-				candyMachineAddress: publicKey(json.candyMachineAddress),
-				collectionAddress: publicKey(json.collectionAddress),
-				label: json.label,
+				candyMachineAddress: publicKey(body.candyMachineAddress),
+				collectionAddress: publicKey(body.collectionAddress),
+				label: body.label,
 				metaplex,
-				minter: publicKey(json.minter),
-				numberOfItems: json.numberOfItems,
+				minter: publicKey(body.minter),
+				numberOfItems: body.numberOfItems,
 				lookupTable,
-				isSponsored: json.isSponsored,
+				isSponsored: body.isSponsored,
 			});
+	
 			return new Response(JSON.stringify({ transaction }));
 		}
 		return new Response('ok');
