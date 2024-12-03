@@ -6,7 +6,6 @@ import {
 	PublicKey as UmiPublicKey,
 	AddressLookupTableInput,
 	publicKey,
-	BlockhashWithExpiryBlockHeight,
 } from '@metaplex-foundation/umi';
 import {
 	DefaultGuardSetMintArgs,
@@ -25,7 +24,6 @@ export async function constructMultipleMintTransaction({
 	minter,
 	label,
 	numberOfItems,
-	blockHash,
 	lookupTable,
 	isSponsored = false,
 	metaplex,
@@ -36,7 +34,6 @@ export async function constructMultipleMintTransaction({
 	minter: UmiPublicKey;
 	label: string;
 	numberOfItems: number;
-	blockHash: BlockhashWithExpiryBlockHeight;
 	lookupTable?: AddressLookupTableInput;
 	isSponsored?: boolean;
 	metaplex: CustomMetaplex;
@@ -51,7 +48,6 @@ export async function constructMultipleMintTransaction({
 			numberOfItems,
 			label,
 			mintArgs,
-			blockHash,
 			lookupTable,
 			isSponsored,
 			metaplex,
@@ -71,7 +67,6 @@ async function getAuthorizedMintTransaction({
 	minter,
 	numberOfItems,
 	label,
-	blockHash,
 	mintArgs,
 	isSponsored = false,
 	lookupTable,
@@ -83,7 +78,6 @@ async function getAuthorizedMintTransaction({
 	numberOfItems: number;
 	label: string;
 	mintArgs: Partial<DefaultGuardSetMintArgs>;
-	blockHash: BlockhashWithExpiryBlockHeight;
 	lookupTable?: AddressLookupTableInput;
 	isSponsored?: boolean;
 	metaplex: CustomMetaplex;
@@ -115,7 +109,7 @@ async function getAuthorizedMintTransaction({
 			})
 		);
 	}
-
+	const blockHash = await metaplex.umi.rpc.getLatestBlockhash({ commitment: 'confirmed' });
 	const transaction = await builder
 		.setBlockhash(blockHash)
 		.addRemainingAccounts({

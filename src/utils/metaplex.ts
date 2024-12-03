@@ -43,7 +43,7 @@ export class CustomMetaplex {
 	 * Retrieves the authorization signer keypair from encrypted environment variables.
 	 */
 	getAuthorizationSignerKeypair(): Keypair {
-		const authorizationSigner = AES.decrypt(this.env.AUTHORIZATION_SIGNER_PRIVATE_KEY,this.env.AUTHORIZATION_SIGNER_SECRET);
+		const authorizationSigner = AES.decrypt(this.env.AUTHORIZATION_SIGNER_PRIVATE_KEY, this.env.AUTHORIZATION_SIGNER_SECRET);
 		const authorizationKeypair = this.umi.eddsa.createKeypairFromSecretKey(Buffer.from(JSON.parse(authorizationSigner.toString(Utf8))));
 
 		return authorizationKeypair;
@@ -80,7 +80,7 @@ export class CustomMetaplex {
 	 * Retrieves the treasury keypair from encrypted environment variables.
 	 */
 	getTreasuryKeypair(): Keypair {
-		const treasurySigner = AES.decrypt(this.env.TREASURY_PRIVATE_KEY,this.env.TREASURY_SECRET);
+		const treasurySigner = AES.decrypt(this.env.TREASURY_PRIVATE_KEY, this.env.TREASURY_SECRET);
 		const treasuryKeypair = this.umi.eddsa.createKeypairFromSecretKey(Buffer.from(JSON.parse(treasurySigner.toString(Utf8))));
 		return treasuryKeypair;
 	}

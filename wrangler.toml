@@ -12,7 +12,9 @@ routes = [{ pattern = "workers.dreader.io", custom_domain = true }]
 enabled = true
 
 [vars]
+AUTHORIZATION_SIGNER_PRIVATE_KEY='signer-private-key'
 AUTHORIZATION_SIGNER_SECRET = 'signer-secret'
+TREASURY_PRIVATE_KEY='treasury-private-key'
 TREASURY_SECRET='treasury-secret'
 HELIUS_API_KEY='helius-api-key'
 SOLANA_CLUSTER='devnet'
