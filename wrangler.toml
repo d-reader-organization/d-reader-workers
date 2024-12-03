@@ -3,7 +3,7 @@ name = "d-reader-workers"
 main = "src/index.ts"
 compatibility_date = "2024-11-27"
 compatibility_flags = ["nodejs_compat"]
-route = "workers.dreader.io"
+routes = [{ pattern = "workers.dreader.io", custom_domain = true }]
 
 # Workers Logs
 # Docs: https://developers.cloudflare.com/workers/observability/logs/workers-logs/
@@ -12,7 +12,7 @@ route = "workers.dreader.io"
 enabled = true
 
 [env.dev]
-route = "dev.workers.dreader.io"
+routes = [{ pattern = "dev.workers.dreader.io", custom_domain = true }]
 
 # Automatically place your workloads in an optimal location to minimize latency.
 # If you are running back-end logic in a Worker, running it closer to your back-end infrastructure
