@@ -17,12 +17,10 @@ export function getLookupTable({
 	if (!address || !bufferString) {
 		return;
 	}
-
+	
 	const lookupTableAddress = publicKey(address);
-	const lookupTableSerialized = getAddressLookupTableAccountDataSerializer().deserialize(
-		// TODO figure out better way
-		Uint8Array.from(bufferString.split(',').map((item) => +item))
-	)[0];
+	const buffer = Buffer.from(bufferString, 'base64')
+	const lookupTableSerialized = getAddressLookupTableAccountDataSerializer().deserialize(buffer)[0];
 	return {
 		addresses: lookupTableSerialized.addresses,
 		publicKey: publicKey(lookupTableAddress),
@@ -36,7 +34,6 @@ export function extractCandyGuardFromBuffer({
 	bufferString: string;
 	umi: Umi;
 }): CandyGuardAccountData<DefaultGuardSet> {
-	// TODO figure out better way
-	const candyGuardBuffer = Uint8Array.from(bufferString.split(',').map((item) => +item));
-	return getCandyGuardAccountDataSerializer<GuardSetArgs, DefaultGuardSet>(umi).deserialize(candyGuardBuffer)[0];
+	const buffer = Buffer.from(bufferString, 'base64')
+	return getCandyGuardAccountDataSerializer<GuardSetArgs, DefaultGuardSet>(umi).deserialize(buffer)[0];
 }
