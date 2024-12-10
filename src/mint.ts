@@ -13,9 +13,10 @@ import {
 	mintV1 as CoreMintV1,
 	CandyGuardAccountData,
 } from '@metaplex-foundation/mpl-core-candy-machine';
-import { setComputeUnitLimit } from '@metaplex-foundation/mpl-toolbox';
+import { setComputeUnitLimit, setComputeUnitPrice } from '@metaplex-foundation/mpl-toolbox';
 import { encodeUmiTransaction } from './utils/transactions';
 import { CustomMetaplex } from './utils/metaplex';
+import { CORE_MINT_COMPUTE_UNITS, MINT_COMPUTE_PRICE } from './constants';
 
 export async function constructMultipleMintTransaction({
 	candyMachineAddress,
@@ -85,15 +86,12 @@ async function getAuthorizedMintTransaction({
 	const identityPublicKey = metaplex.getTreasuryPublicKey();
 	const authorizationSigner = metaplex.getAuthorizationSignerUmiPublicKey();
 	const signer = createNoopSigner(minter);
-	const CORE_MINT_COMPUTE_UNITS = 160000;
 
 	const payer = isSponsored ? createNoopSigner(identityPublicKey) : signer;
 	const umi = metaplex.umi;
-	let builder = transactionBuilder().add(
-		setComputeUnitLimit(umi, {
-			units: CORE_MINT_COMPUTE_UNITS * numberOfItems,
-		})
-	);
+	let builder = transactionBuilder()
+		.add(setComputeUnitLimit(umi, { units: CORE_MINT_COMPUTE_UNITS * numberOfItems }))
+		.add(setComputeUnitPrice(umi, { microLamports: MINT_COMPUTE_PRICE }));
 
 	for (let i = 0; i < numberOfItems; i++) {
 		const asset = generateSigner(umi);
