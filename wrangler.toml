@@ -4,6 +4,8 @@ main = "src/index.ts"
 compatibility_date = "2024-11-27"
 compatibility_flags = ["nodejs_compat"]
 routes = [{ pattern = "workers.dreader.io", custom_domain = true }]
+[vars]
+SOLANA_CLUSTER = 'mainnet-beta'
 
 # Workers Logs
 # Docs: https://developers.cloudflare.com/workers/observability/logs/workers-logs/
@@ -13,6 +15,8 @@ enabled = true
 
 [env.dev]
 routes = [{ pattern = "dev.workers.dreader.io", custom_domain = true }]
+[env.dev.vars]
+SOLANA_CLUSTER = 'devnet'
 
 # Automatically place your workloads in an optimal location to minimize latency.
 # If you are running back-end logic in a Worker, running it closer to your back-end infrastructure

@@ -18,7 +18,6 @@ import { extractCandyGuardFromBuffer, getLookupTable } from './utils/utils';
 import { apiHeaderKey, constructMintPath } from './constants';
 import { constructMintTransactionSchema } from './utils/schema';
 
-
 export default {
 	async fetch(request, env, ctx): Promise<Response> {
 		const apiKey = request.headers.get(apiHeaderKey);
